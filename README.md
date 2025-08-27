@@ -9,3 +9,4 @@
 - **Giảng viên**: Nguyễn Hữu Trung
 - **Bài tập 01 (19/08/2025)**: Cài đặt môi trường ✅
 - **Bài tập 02 (20/08/2025)**: CRUD với ExpressJS ✅
+- **Bài tập 03 (26/08/2025)**: CRUD với ExpressJS bằng TypeScript ✅
