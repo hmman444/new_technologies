@@ -9,6 +9,7 @@ const configViewEngine = require('./config/viewEngine');
 const connection = require('./config/database');
 const apiRoutes = require('./routes/api');
 const { getHomepage } = require('./controllers/homeController');
+const productRoutes = require("./routes/product");
 
 const app = express(); // khởi tạo app express
 
@@ -30,6 +31,9 @@ app.use('/', webAPI);
 
 // route cho API (RESTful)
 app.use('/v1/api', apiRoutes);
+
+// route cho product API (RESTful)
+app.use("/v1/api/product", productRoutes);
 
 // kết nối DB & start server
 (async () => {

@@ -1,8 +1,7 @@
-import React from "react";
-import { Button, Col, Divider, Form, Input, notification, Row } from "antd";
-import { createUserApi } from "../utils/api";
-import { Link, useNavigate } from "react-router-dom";
 import { ArrowLeftOutlined } from "@ant-design/icons";
+import { Button, Col, Divider, Form, Input, notification, Row } from "antd";
+import { Link, useNavigate } from "react-router-dom";
+import { createUserApi } from "../../../utils/api";
 
 const RegisterPage = () => {
     const navigate = useNavigate();

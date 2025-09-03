@@ -3,11 +3,13 @@ import ReactDOM from 'react-dom/client';
 import App from './App.jsx';
 import './styles/global.css';
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
+import { Provider } from "react-redux";
+import store from "./store.js";
 
-import RegisterPage from './pages/register.jsx';
-import UserPage from './pages/user.jsx';
-import HomePage from './pages/home.jsx';
-import LoginPage from './pages/login.jsx';
+import RegisterPage from '../src/features/auth/pages/registerPage.jsx';
+import UserPage from '../src/features/auth/pages/userPage.jsx';
+import HomePage from '../src/features/auth/pages/homePage.jsx';
+import LoginPage from '../src/features/auth/pages/loginPage.jsx';
 import { AuthWrapper } from './components/context/auth.context.jsx';
 
 const router = createBrowserRouter([
@@ -15,8 +17,8 @@ const router = createBrowserRouter([
         path: "/",
         element: <App />,
         children: [
-        { index: true, element: <HomePage /> },
-        { path: "user", element: <UserPage /> },
+            { index: true, element: <HomePage /> },
+            { path: "user", element: <UserPage /> },
         ],
     },
     { path: "register", element: <RegisterPage /> },
@@ -25,8 +27,10 @@ const router = createBrowserRouter([
 
 ReactDOM.createRoot(document.getElementById('root')).render(
     <React.StrictMode>
-        <AuthWrapper>
-        <RouterProvider router={router} />
-        </AuthWrapper>
+        <Provider store={store}>
+            <AuthWrapper>
+                <RouterProvider router={router} />
+            </AuthWrapper>
+        </Provider>
     </React.StrictMode>
 );
