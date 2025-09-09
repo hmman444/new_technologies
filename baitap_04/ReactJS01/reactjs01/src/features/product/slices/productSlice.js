@@ -14,10 +14,10 @@ const initialState = {
 // Async thunk lấy sản phẩm
 export const fetchProducts = createAsyncThunk(
     "product/fetchProducts",
-    async ({ page = 1, limit = 10, category = "", search = "" }, thunkAPI) => {
+    async ({ page = 1, limit = 10, category = "", search = "", filter = "" }, thunkAPI) => {
         try {
-            const res = await getProductsApi({ page, limit, category, search });
-            return res; // { products, total, page, limit }
+            const res = await getProductsApi({ page, limit, category, search, filter });
+            return res;
         } catch (err) {
             return thunkAPI.rejectWithValue(err.message || "Error fetching products");
         }

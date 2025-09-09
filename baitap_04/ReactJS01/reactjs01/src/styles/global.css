@@ -1,5 +1,10 @@
-* {
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* reset base */
+body {
     margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    font-family: system-ui, sans-serif;
+    background-color: #f9fafb;
 }

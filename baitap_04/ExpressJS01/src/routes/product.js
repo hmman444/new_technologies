@@ -9,4 +9,6 @@ router.get("/", productController.getProducts);
 // GET /v1/api/products/:id
 router.get("/:id", productController.getProductDetail);
 
+router.get("/categories/all", productController.getCategories);
+
 module.exports = router;

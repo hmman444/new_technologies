@@ -14,7 +14,7 @@ const ProductCard = React.forwardRef(({ p }, ref) => {
             {/* ảnh fixed height để card gọn */}
             <img src={img} alt={p.name} className="w-full h-32 sm:h-36 object-cover" />
             <div className="p-2 sm:p-3">
-            <h3 className="text-sm font-semibold text-black line-clamp-2">
+            <h3 className="text-sm font-semibold text-black line-clamp-2 h-10">
                 {p.name}
             </h3>
             <p className="text-xs text-gray-500 mt-1 truncate">{p.category || "Đặc sản"}</p>
