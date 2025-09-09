@@ -1,28 +1,38 @@
-// ProductCard.jsx
 import React from "react";
 import { Link } from "react-router-dom";
 
 const ProductCard = React.forwardRef(({ p }, ref) => {
-    const img = p?.images?.[0] || "https://via.placeholder.com/400x300?text=No+Image";
+    const img =
+        p?.images?.[0] || "https://via.placeholder.com/400x300?text=No+Image";
 
     return (
         <div
         ref={ref}
-        className="bg-white rounded-lg shadow-md overflow-hidden transform transition duration-150 hover:shadow-lg hover:scale-105"
+        className="bg-white rounded-lg shadow-sm overflow-hidden flex flex-col hover:shadow-md transition-transform transform hover:scale-105 max-w-[200px] mx-auto"
         >
-        <Link to={`/product/${p._id}`}>
-            {/* ảnh fixed height để card gọn */}
-            <img src={img} alt={p.name} className="w-full h-32 sm:h-36 object-cover" />
-            <div className="p-2 sm:p-3">
-            <h3 className="text-sm font-semibold text-black line-clamp-2 h-10">
+        <Link to={`/product/${p._id}`} className="flex flex-col h-full">
+            {/* Ảnh - vuông cho đồng đều */}
+            <div className="w-full aspect-square overflow-hidden">
+            <img
+                src={img}
+                alt={p.name}
+                className="w-full h-full object-cover"
+            />
+            </div>
+
+            {/* Nội dung */}
+            <div className="flex-1 flex flex-col p-2">
+            <h3 className="text-xs font-semibold text-gray-800 line-clamp-2 mb-1">
                 {p.name}
             </h3>
-            <p className="text-xs text-gray-500 mt-1 truncate">{p.category || "Đặc sản"}</p>
-            <div className="mt-2 flex items-center justify-between">
-                <span className="text-sm font-semibold text-black">
+            <p className="text-[11px] text-gray-500 truncate">
+                {p.category || "Đặc sản"}
+            </p>
+            <div className="mt-auto flex items-center justify-between pt-1">
+                <span className="text-xs font-bold text-black">
                 {p.price?.toLocaleString() || "--"} ₫
                 </span>
-                <span className="text-xs text-gray-500">{p.views ?? 0} 👁</span>
+                <span className="text-[11px] text-gray-500">{p.views ?? 0} 👁</span>
             </div>
             </div>
         </Link>
