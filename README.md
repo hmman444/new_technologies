@@ -12,3 +12,4 @@
 - **Bài tập 03 (26/08/2025)**: CRUD với ExpressJS bằng TypeScript ✅
 - **Bài tập 04 (27/08/2025)**: Fullstack với ExpressJS, ReactJS ✅
 - **Bài tập 05 (03/09/2025)**: Lazy Loading & Paging ✅
+- **Bài tập 06 (09/09/2025)**: Tìm kiếm và lọc dữ liệug ✅
