@@ -1,0 +1,33 @@
+{
+  "name": "cart-library-hmman444",
+  "version": "1.0.2",
+  "description": "React Cart Library with UI Components",
+  "main": "dist/index.js",
+  "module": "dist/index.mjs",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup src/index.ts --format esm,cjs --dts --out-dir dist",
+    "dev": "tsup src/index.ts --watch --format cjs,esm --dts"
+  },
+  "keywords": [
+    "react",
+    "cart",
+    "library",
+    "components"
+  ],
+  "author": "hmman444",
+  "license": "MIT",
+  "peerDependencies": {
+    "react": ">=18.0.0",
+    "react-dom": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "^19.1.12",
+    "@types/react-dom": "^19.1.9",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.2"
+  }
+}
