@@ -9,7 +9,7 @@ const auth = (req, res, next) => {
     const path = req.path.replace(/^\/v1\/api/, ""); // chỉ /product, /order, etc.
 
     // Nếu route public hoặc route product → next
-    if (white_lists.includes(path) || path.startsWith("/product")) {
+    if (white_lists.includes(path) || (path.startsWith("/product") && req.method === "GET")) {
         return next();
     }
 
@@ -20,6 +20,7 @@ const auth = (req, res, next) => {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
             req.user = {
+                id: decoded.id,
                 email: decoded.email,
                 name: decoded.name,
                 createdBy: "hoidanit"

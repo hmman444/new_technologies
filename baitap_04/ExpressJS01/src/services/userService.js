@@ -49,8 +49,9 @@ const loginService = async (email1, password) => {
         } else {
             // create an access token
             const payload = {
-            email: user.email,
-            name: user.name
+                id: user._id,
+                email: user.email,
+                name: user.name
             };
 
             const access_token = jwt.sign(

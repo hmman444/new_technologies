@@ -1,13 +1,6 @@
-// productService.js
-import axios from "axios";
-import { API_BASE_URL } from "../../../config";
+import axios from "../../../utils/axios.customize";
 
-export const getProductsApi = async (params = {}) => {
-  const res = await axios.get(`${API_BASE_URL}/product`, { params });
-  return res.data;
-};
-
-export const getProductDetailApi = async (id) => {
-  const res = await axios.get(`${API_BASE_URL}/product/${id}`);
-  return res.data;
-};
+export const getProductsApi = (params = {}) => axios.get("/v1/api/product", { params });
+export const getProductDetailApi = (id) => axios.get(`/v1/api/product/${id}`);
+export const toggleWishlistApi = (productId) => axios.post("/v1/api/product/wishlist/toggle", { productId });
+export const getWishlistApi = () => axios.get("/v1/api/product/wishlist");

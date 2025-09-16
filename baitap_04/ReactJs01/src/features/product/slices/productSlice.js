@@ -1,6 +1,10 @@
-// src/features/product/slices/productSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
-import { getProductsApi, getProductDetailApi } from "../services/productService";
+import {
+    getProductsApi,
+    getProductDetailApi,
+    toggleWishlistApi,
+    getWishlistApi,
+} from "../services/productService";
 
 const initialState = {
     products: [],
@@ -11,30 +15,51 @@ const initialState = {
     loading: false,
     error: null,
     productDetail: null,
+    wishlistIds: [],
 };
 
-// Async thunk: lấy danh sách sản phẩm
 export const fetchProducts = createAsyncThunk(
     "product/fetchProducts",
     async ({ page = 1, limit = 10, category = "", search = "", filter = "" }, thunkAPI) => {
         try {
-        const res = await getProductsApi({ page, limit, category, search, filter });
-        return res;
+        return await getProductsApi({ page, limit, category, search, filter });
         } catch (err) {
         return thunkAPI.rejectWithValue(err.message || "Error fetching products");
         }
     }
 );
 
-// Async thunk: lấy chi tiết sản phẩm
 export const fetchProductDetail = createAsyncThunk(
     "product/fetchDetail",
     async (id, thunkAPI) => {
         try {
-        const res = await getProductDetailApi(id);
-        return res;
+        return await getProductDetailApi(id);
         } catch (err) {
         return thunkAPI.rejectWithValue(err.message || "Error fetching product detail");
+        }
+    }
+);
+
+export const toggleWishlist = createAsyncThunk(
+    "product/toggleWishlist",
+    async (productId, thunkAPI) => {
+        try {
+        // backend đã trả { liked, message, productId } (nhớ đã sửa controller)
+        return await toggleWishlistApi(productId);
+        } catch (err) {
+        return thunkAPI.rejectWithValue(err.message || "Error toggle wishlist");
+        }
+    }
+);
+
+export const fetchWishlist = createAsyncThunk(
+    "product/fetchWishlist",
+    async (_, thunkAPI) => {
+        try {
+        // backend trả mảng: [{ userId, productId: {...} }, ...]
+        return await getWishlistApi();
+        } catch (err) {
+        return thunkAPI.rejectWithValue(err.message || "Error fetching wishlist");
         }
     }
 );
@@ -56,25 +81,25 @@ const productSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
-        // danh sách
+        // list
         .addCase(fetchProducts.pending, (state) => {
             state.loading = true;
         })
         .addCase(fetchProducts.fulfilled, (state, action) => {
             state.loading = false;
             const { products, total, page, limit } = action.payload;
-            state.products = products; // ✅ giữ đúng data trang hiện tại
+            state.products = products;
             state.total = total;
             state.page = page;
             state.limit = limit;
-            state.totalPage = Math.ceil(total / limit); // ✅ tính tổng số trang
+            state.totalPage = Math.ceil(total / limit);
         })
         .addCase(fetchProducts.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
         })
 
-        // chi tiết
+        // detail
         .addCase(fetchProductDetail.pending, (state) => {
             state.loading = true;
             state.error = null;
@@ -86,6 +111,26 @@ const productSlice = createSlice({
         .addCase(fetchProductDetail.rejected, (state, action) => {
             state.loading = false;
             state.error = action.payload;
+        })
+
+        // wishlist
+        .addCase(fetchWishlist.fulfilled, (state, action) => {
+            // map về array ID, dù backend populate hay không
+            state.wishlistIds = (action.payload || []).map(
+            (w) => w.productId?._id ?? w.productId
+            );
+        })
+        .addCase(toggleWishlist.fulfilled, (state, action) => {
+            const { liked, productId } = action.payload || {};
+            if (!productId) return;
+
+            if (liked) {
+            if (!state.wishlistIds.includes(productId)) {
+                state.wishlistIds.push(productId);
+            }
+            } else {
+            state.wishlistIds = state.wishlistIds.filter((id) => id !== productId);
+            }
         });
     },
 });

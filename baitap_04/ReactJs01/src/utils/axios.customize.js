@@ -7,14 +7,21 @@ const instance = axios.create({
 // request interceptor
 instance.interceptors.request.use(
     function (config) {
-        // Nếu route là /product hoặc /product/:id thì không gửi token
+        const isGet = config.method === "get";
+        const url = config.url.startsWith("/") ? config.url : `/${config.url}`;
+
         const publicRoutes = ["/product", "/product/"];
-        if (!publicRoutes.some(path => config.url.startsWith(path))) {
-            const token = localStorage.getItem("access_token");
-            if (token) {
-                config.headers.Authorization = `Bearer ${token}`;
-            }
+
+        if (isGet && publicRoutes.some(path => url.startsWith(path))) {
+        return config; // GET list/detail thì public
         }
+
+        const token = localStorage.getItem("access_token");
+        if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+        console.log("👉 Attach token:", token, "for", url);
+        }
+
         return config;
     },
     function (error) {
