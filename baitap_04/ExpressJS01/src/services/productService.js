@@ -1,62 +1,106 @@
 const Product = require("../models/Product");
+const { esClient } = require("../config/elasticsearch");
 
 class ProductService {
-    static async getProducts({ 
+    static async getProducts({
         page = 1,
         limit = 10,
         category = "",
         search = "",
         filter = ""
     }) {
-        let query = { isActive: true };
-        let sortOption = { createdAt: -1 };
+        page = parseInt(page);
+        limit = parseInt(limit);
 
-        // 1. Nếu có search thì chỉ tìm theo search, bỏ qua filter khác
+        // sort mặc định
+        let esSort = [{ createdAt: { order: "desc", unmapped_type: "long" } }];
+        let mongoSort = { createdAt: -1 };
+
+        // Nếu có search → dùng Elasticsearch
         if (search) {
-            query.name = { $regex: search, $options: "i" };
+            try {
+                const must = [{
+                    multi_match: {
+                        query: search,
+                        fields: ["name", "description"],
+                        fuzziness: "AUTO"
+                    }
+                }];
 
-            const products = await Product.find(query)
-                .skip((page - 1) * limit)
-                .limit(parseInt(limit))
-                .sort(sortOption);
+                const filterQuery = [];
 
-            const total = await Product.countDocuments(query);
+                if (category) {
+                    filterQuery.push({ term: { category } });
+                }
 
-            return { products, total, page: parseInt(page), limit: parseInt(limit) };
+                switch (filter) {
+                    case "discount":
+                        filterQuery.push({ range: { salePrice: { gt: 0 } } });
+                        break;
+                    case "views":
+                        esSort = [{ views: { order: "desc", unmapped_type: "long" } }];
+                        break;
+                    case "newest":
+                        esSort = [{ createdAt: { order: "desc", unmapped_type: "long" } }];
+                        break;
+                    case "best":
+                        esSort = [{ stock: { order: "desc", unmapped_type: "long" } }];
+                        break;
+                }
+
+                const result = await esClient.search({
+                    index: "products",
+                    from: (page - 1) * limit,
+                    size: limit,
+                    query: {
+                        bool: {
+                            must,
+                            filter: filterQuery
+                        }
+                    },
+                    sort: esSort
+                });
+
+                const products = result.hits.hits.map(hit => hit._source);
+                const total = result.hits.total.value;
+
+                return { products, total, page, limit };
+            } catch (err) {
+                console.error("❌ ES search error:", err.meta?.body?.error || err);
+                throw new Error("Elasticsearch query failed");
+            }
         }
 
-        // 2. Nếu không search thì mới áp dụng filter + category
+        // ✅ Không có search → fallback MongoDB
+        let query = { isActive: true };
+
         if (category) {
             query.category = category;
         }
 
         switch (filter) {
-            case "newest":
-                sortOption = { createdAt: -1 };
-                limit = 8;
-                break;
-            case "best":
-                sortOption = { stock: -1 }; // (hoặc field sold nếu có)
-                limit = 6;
-                break;
-            case "views":
-                sortOption = { views: -1 };
-                limit = 8;
-                break;
             case "discount":
                 query.salePrice = { $gt: 0 };
-                limit = 4;
+                break;
+            case "views":
+                mongoSort = { views: -1 };
+                break;
+            case "newest":
+                mongoSort = { createdAt: -1 };
+                break;
+            case "best":
+                mongoSort = { stock: -1 };
                 break;
         }
 
         const products = await Product.find(query)
             .skip((page - 1) * limit)
-            .limit(parseInt(limit))
-            .sort(sortOption);
+            .limit(limit)
+            .sort(mongoSort);
 
         const total = await Product.countDocuments(query);
 
-        return { products, total, page: parseInt(page), limit: parseInt(limit) };
+        return { products, total, page, limit };
     }
 
     static async getProductDetail(id) {
